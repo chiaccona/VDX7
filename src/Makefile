@@ -245,7 +245,7 @@ tar:
 		*.h *.cc Makefile \
 		firmware.bin voices.bin panel.xpm *.ttl* \
 		GTK/fader.png GTK/style.css GTK/image.gresource.xml GTK/*.cc GTK/*.h \
-		example.ram ChangeLog README* LICENSE COPYRIGHT 
+		example.ram ../ChangeLog ../README* ../LICENSE ../COPYRIGHT 
 
 GTK/resources.c: GTK/image.gresource.xml GTK/fader.png
 	( cd GTK; glib-compile-resources image.gresource.xml --generate-source --target=resources.c )

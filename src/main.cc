@@ -85,7 +85,7 @@ int getConfigFile(std::string &fn) {
 int main(int argc, char* argv[]) {
 	int err;
 
-	const char* opts = "c:n:b:B:s:t:V:i:o:p:r:aqhvm";
+	const char* opts = "c:n:b:B:s:t:V:i:o:p:r:aqhvmk";
 	const struct option long_opts[] = {
 		{"cart",		required_argument,	0,	'c'},
 		{"new",			required_argument,	0,	'n'},
@@ -101,6 +101,7 @@ int main(int argc, char* argv[]) {
 		{"noauto",		no_argument,		0,	'a'},
 		{"quiet",		no_argument,		0,	'q'},
 		{"serial",		no_argument,		0,	'm'},
+		{"keyboard",	no_argument,		0,	'k'},
 		{"help",		no_argument,		0,	'h'},
 		{"version",		no_argument,		0,	'v'},
 		{0, 0, 0, 0},
@@ -120,6 +121,7 @@ int main(int argc, char* argv[]) {
 	bool tune = false; // set tuning
 	int tuning = 0; // tuning value to set 
 	bool serial = false; // send midi directly to synth
+	bool showKeyboard = true; // show keybaord and controls on GUI
 	char *velArg = 0; // velocity map
 
 	int c;
@@ -161,6 +163,7 @@ int main(int argc, char* argv[]) {
 			break;
 		case 'a': noauto = true; break;
 		case 'm': serial = true; break;
+		case 'k': showKeyboard = false; break;
 		case 'q': quiet = true; break;
 		case 'h':
 		default:
@@ -171,6 +174,7 @@ int main(int argc, char* argv[]) {
 				"	-q quiet (no terminal stdout)\n"
 				"	-a don't autoconnect Jack midi\n"
 				"	-m send MIDI directly to DX7 serial interface\n"
+				"	-k don't show keyboard on GUI\n"
 				"	-c filename (sysex cartridge file)\n"
 				"	-n filename (create new sysex cartridge file)\n"
 				"	-r filename (load a firmware ROM)\n"
@@ -273,7 +277,7 @@ int main(int argc, char* argv[]) {
 	return app->run(gui); // Run GUI
 #else
 	// X11 version
-	DX7GUI gui;
+	DX7GUI gui(showKeyboard);
 	gui.toGui = &toGui;
 	gui.toSynth = &toSynth;
 

@@ -55,6 +55,7 @@ Usage: dx7
    -q quiet (no terminal stdout)
    -a don't autoconnect Jack midi
    -m send MIDI directly to DX7 serial interface
+   -k don't show keyboard on GUI
    -c filename (sysex cartridge file)
    -n filename (create new sysex cartridge file)
    -r filename (load a firmware ROM)
