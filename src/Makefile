@@ -30,7 +30,7 @@
 ##################################
 ##### Configuration options: #####
 ##################################
-USE_NATIVE=1
+USE_NATIVE=0
 USE_LV2=1
 USE_ARM=0
 USE_GTKMM=0
@@ -96,12 +96,14 @@ CXXFLAGS=
 CFLAGS=
 CPPFLAGS=
 
-CFLAGS+= -g -O3 -Wall
+CFLAGS+= -g -O3 -Wall -pipe
 CFLAGS+= -fomit-frame-pointer 
 CFLAGS+= -ffast-math -fno-finite-math-only
 
 ifeq ($(USE_NATIVE),1)
 	CFLAGS+= -march=native
+else
+	CFLAGS+= -mtune=generic
 endif
 
 CXXFLAGS+= -std=c++17
@@ -118,7 +120,7 @@ CPPFLAGS+=-DVERSION=$(VERSION)$(BUILD)
 # Force G++ to inline the EGS and OPS clock functions
 CPPFLAGS+=-DINLINE_EGS
 
-CFLAGS+= -fPIC 
+CFLAGS+= -fPIC -DPIC
 
 LV2_CFLAGS= -fvisibility=hidden -Wl,-Bstatic -Wl,-Bdynamic -Wl,--as-needed \
 	-shared `pkg-config --cflags lv2`
@@ -168,6 +170,9 @@ lv2: $(LV2_EXEC)
 ################################################################
 
 BUILD_DIR ?= ./.build
+RELEASE=$(APP)_$(VERSION)_linux_x86_64
+RELEASE_DIR=$(BUILD_DIR)/$(RELEASE)
+
 SRC_DIRS ?= .
 
 APP_OBJS := $(APP_SRCS:%=$(BUILD_DIR)/%.o)
@@ -239,6 +244,22 @@ endif
 
 clean:
 	$(RM) -r $(BUILD_DIR) $(APP_EXEC) $(LV2_EXEC)
+
+release: $(MANIFEST) $(LV2_EXEC)
+	$(RM) -r $(RELEASE_DIR)
+	@$(MKDIR_P) $(RELEASE_DIR)
+	@$(MKDIR_P) $(RELEASE_DIR)
+	cp $(APP) $(RELEASE_DIR)
+	strip $(RELEASE_DIR)/$(APP)
+	cp ../README.md ../README.FAQ.md ../LICENSE ../COPYRIGHT $(RELEASE_DIR)
+	cp example.ram $(RELEASE_DIR)/vdx7.ram
+ifeq ($(USE_LV2),1)
+	@$(MKDIR_P) $(RELEASE_DIR)/$(APP).lv2
+	cp $(MANIFEST) $(LV2_EXEC) $(RELEASE_DIR)/$(APP).lv2
+	strip $(RELEASE_DIR)/$(APP).lv2/$(LV2_EXEC)
+	cp example.ram $(RELEASE_DIR)/$(APP).lv2/vdx7.ram
+endif
+	( cd $(BUILD_DIR) ; tar -czvf ../$(RELEASE).tgz $(RELEASE) )
 
 tar:
 	tar $(NO_TARBOMB) -czvf $(APP)_$(VERSION)_$(shell date +%m%d%y-%H%M%S).tgz \

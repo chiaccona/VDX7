@@ -27,13 +27,16 @@ pluginram:
 	rdfs:range atom:Path .
 
 plugin:
-	a lv2:Plugin ;
+	a lv2:InstrumentPlugin,lv2:Plugin ;
 	doap:name "VDX7" ;
 	doap:maintainer <urn:chiaccona:vdx7#me> ;
     doap:license <http://opensource.org/licenses/GPL-3.0> ;
 
 	lv2:requiredFeature urid:map ;
+	lv2:requiredFeature state:loadDefaultState ;
 	lv2:optionalFeature lv2:hardRTCapable ;
+
+    lv2:extensionData <http://lv2plug.in/ns/ext/state#interface> ;
 
 	ui:ui plugingui: ;
 
