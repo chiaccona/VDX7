@@ -610,7 +610,7 @@ bool FileMgr::event(XEvent e) {
 			break;
 		}
 
-		case ButtonPressMask:
+		case ButtonPress:
 			switch(e.xbutton.button) {
 				case 1: click(e.xbutton.x, e.xbutton.y); break;
 				case 4: scrollUp(); break;
