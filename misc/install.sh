@@ -1,4 +1,4 @@
-#/usr/bin/bash
+#!/usr/bin/bash
 
 # By default, installs to user's local directories
 # Change these as appropriate

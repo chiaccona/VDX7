@@ -1,4 +1,4 @@
-#/usr/bin/bash
+#!/usr/bin/bash
 
 INSTALLDIR=~/.local/bin
 CONFIGDIR=~/.config

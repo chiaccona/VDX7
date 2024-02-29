@@ -1,5 +1,11 @@
-misc
 ChangeLog
+workflow
+.build
+.gitignore
+src/vdx7
+*.tgz
+old
+
 # ---> C++
 # Prerequisites
 *.d

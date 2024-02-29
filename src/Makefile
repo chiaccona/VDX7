@@ -251,7 +251,7 @@ release: $(MANIFEST) $(LV2_EXEC)
 	@$(MKDIR_P) $(RELEASE_DIR)
 	cp $(APP) $(RELEASE_DIR)
 	strip $(RELEASE_DIR)/$(APP)
-	cp ../README.md ../README.FAQ.md ../LICENSE ../COPYRIGHT install.sh uninstall.sh $(RELEASE_DIR)
+	cp ../README.md ../README.FAQ.md ../LICENSE ../COPYRIGHT ../misc/install.sh ../misc/uninstall.sh $(RELEASE_DIR)
 	cp example.ram $(RELEASE_DIR)/vdx7.ram
 ifeq ($(USE_LV2),1)
 	@$(MKDIR_P) $(RELEASE_DIR)/$(APP).lv2
@@ -259,7 +259,7 @@ ifeq ($(USE_LV2),1)
 	strip $(RELEASE_DIR)/$(APP).lv2/$(LV2_EXEC)
 	cp example.ram $(RELEASE_DIR)/$(APP).lv2/vdx7.ram
 endif
-	( cd $(BUILD_DIR) ; tar -czvf ../$(RELEASE).tgz $(RELEASE) )
+	( cd $(BUILD_DIR) ; tar -czvf ../../$(RELEASE).tgz $(RELEASE) )
 
 tar:
 	tar $(NO_TARBOMB) -czvf $(APP)_$(VERSION)_$(shell date +%m%d%y-%H%M%S).tgz \
