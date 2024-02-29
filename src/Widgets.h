@@ -348,7 +348,6 @@ struct FileMgr {
 	// File data
 	std::vector<std::string> filelist; // displayed filenames
 	std::filesystem::path dir; // current directory
-	std::vector<std::filesystem::path> files_in_dir; // all files in dir
 };
 
 struct FileMgrPopup {

@@ -30,7 +30,7 @@ void DX7GUI::idle() {
 		led1->draw();
 		led2->draw();
 		XFlush(display);
-	} else processEvent();
+	} else while(XPending(display)) processEvent();
 }
 
 void DX7GUI::run() {

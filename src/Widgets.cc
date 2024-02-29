@@ -507,11 +507,9 @@ inline void FileMgr::factoryVoices() {
 	XStoreName(ctx.d, win, "Factory Voices");
 
 	// Reset lists
-	files_in_dir.clear();
 	filelist.clear();
 
 	// Create displayed listing
-	filelist.push_back("./");
 	filelist.push_back("../");
 
 	for (auto & rom : factoryROMs) filelist.push_back(rom);
@@ -523,44 +521,34 @@ inline void FileMgr::factoryVoices() {
 
 // Load a directory
 void FileMgr::load(std::string d) {
-	dir = std::filesystem::canonical(d);
-	XStoreName(ctx.d, win, dir.c_str());
-
-	// Reset lists
-	files_in_dir.clear();
 	filelist.clear();
-
-	// Sort
-	std::copy(std::filesystem::directory_iterator{dir},
-		std::filesystem::directory_iterator(),
-		std::back_inserter(files_in_dir));
-	std::sort(files_in_dir.begin(), files_in_dir.end());
-
-	// Create displayed listing
-	filelist.push_back("./");
 	filelist.push_back("../");
-
-	for (auto & path : files_in_dir) {
-		if(!all) if(path.filename().c_str()[0] == '.') continue;
-		if(is_regular_file(path)) {
-			if(filter) {
-				for(auto &s : filters) {
-					if(s == path.extension()) {
-						filelist.push_back(path.filename());
-						break;
+	try {
+		dir = std::filesystem::canonical(d);
+		if(!is_directory(dir)) dir = dir.parent_path(); // strip off filename, if any
+		for (auto const& dir_entry : std::filesystem::directory_iterator{dir}) {
+			auto path = dir_entry.path();
+			if(!all) if(path.filename().string()[0] == '.') continue; // Skip hidden files
+			if(is_regular_file(path)) {
+				if(filter) { // apply file extension filters
+					for(auto &s : filters) {
+						if(s == path.extension()) {
+							filelist.push_back(path.filename());
+							break;
+						}
 					}
-				}
-			} else {
-				filelist.push_back(path.filename());
+				} else filelist.push_back(path.filename());
 			}
+			else if(is_directory(path)) filelist.push_back(path.filename().string() + "/");
 		}
-		else if(is_directory(path)) {
-			filelist.push_back(std::string(path.filename()) + "/");
-		}
+	} catch(const std::exception& ex) { // can't read dir
+		fprintf(stderr, "Could not read \"%s\":\n%s\n", d.c_str(), ex.what());
 	}
-	start = end = 0;
-	selected = 0;
+	// Sort files
+	std::sort(filelist.begin(), filelist.end());
+	start = end = selected = 0;
 	factory = false;
+	XStoreName(ctx.d, win, dir.c_str()); // display in title bar
 	draw();
 }
 
