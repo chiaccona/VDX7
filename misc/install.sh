@@ -2,18 +2,25 @@
 
 # By default, installs to user's local directories
 # Change these as appropriate
-INSTALLDIR=~/.local/bin
+INSTALLDIR=~/.local
 CONFIGDIR=~/.config
 INSTALLDIR_LV2=~/.lv2
+DESKTOP=~/Desktop
+APP=vdx7
 
 
 # Copy files
 
-APP=vdx7
-
 # App
-mkdir -p ${INSTALLDIR}
-cp ${APP} ${INSTALLDIR}
+mkdir -p ${INSTALLDIR}/bin
+cp ${APP} ${INSTALLDIR}/bin
+
+# Desktop
+mkdir -p ${INSTALLDIR}/share/icons/hicolor/128x128/apps
+cp ${APP}.png ${INSTALLDIR}/share/icons/hicolor/128x128/apps
+if test -d ${DESKTOP} ; then
+	cp ${APP}.desktop ${DESKTOP}
+fi
 
 # config file
 mkdir -p ${CONFIGDIR}/${APP}
