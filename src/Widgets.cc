@@ -554,7 +554,7 @@ void FileMgr::load(std::string d) {
 
 bool FileMgr::onreturn() {
 	if(factory) {
-		int rom = selected-2;
+		int rom = selected-1;
 		printf("selected ROM: %s\n", factoryROMs[rom].c_str());
 		ctx.toSynth->load_cartridge_num(rom);
 		return true;
