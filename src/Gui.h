@@ -83,3 +83,24 @@ private:
 
 	friend class DX7PluginGUI;
 };
+
+class DX7Headless {
+public:
+	DX7Headless() {}
+	~DX7Headless() {}
+	void run() { fprintf(stderr, "Headless mode. Hit <return> to quit\n"); getchar(); stop(); }
+	void idle() { } // Idle loop body for LV2
+	void stop() { running = false; }
+
+	// For LV2
+	void restore() { }
+	Window widget() { return 0; } // FIX will crash LV2
+
+	// Communication Lock-Free Queue from Synth
+	ToGui *toGui;
+	ToSynth *toSynth;
+
+private:
+	bool running = true;
+};
+

@@ -85,7 +85,7 @@ int getConfigFile(std::string &fn) {
 int main(int argc, char* argv[]) {
 	int err;
 
-	const char* opts = "c:n:b:B:s:t:V:i:o:p:r:aqhvmk";
+	const char* opts = "c:n:b:B:s:t:V:i:o:p:r:aqhvmkH";
 	const struct option long_opts[] = {
 		{"cart",		required_argument,	0,	'c'},
 		{"new",			required_argument,	0,	'n'},
@@ -102,6 +102,7 @@ int main(int argc, char* argv[]) {
 		{"quiet",		no_argument,		0,	'q'},
 		{"serial",		no_argument,		0,	'm'},
 		{"keyboard",	no_argument,		0,	'k'},
+		{"headless",	no_argument,		0,	'H'},
 		{"help",		no_argument,		0,	'h'},
 		{"version",		no_argument,		0,	'v'},
 		{0, 0, 0, 0},
@@ -122,6 +123,7 @@ int main(int argc, char* argv[]) {
 	int tuning = 0; // tuning value to set 
 	bool serial = false; // send midi directly to synth
 	bool showKeyboard = true; // show keybaord and controls on GUI
+	bool headless = false; // no GUI
 	char *velArg = 0; // velocity map
 
 	int c;
@@ -164,6 +166,7 @@ int main(int argc, char* argv[]) {
 		case 'a': noauto = true; break;
 		case 'm': serial = true; break;
 		case 'k': showKeyboard = false; break;
+		case 'H': headless = true; break;
 		case 'q': quiet = true; break;
 		case 'h':
 		default:
@@ -175,6 +178,7 @@ int main(int argc, char* argv[]) {
 				"	-a don't autoconnect Jack midi\n"
 				"	-m send MIDI directly to DX7 serial interface\n"
 				"	-k don't show keyboard on GUI\n"
+				"	-H headless mode, no GUI\n"
 				"	-c filename (sysex cartridge file)\n"
 				"	-n filename (create new sysex cartridge file)\n"
 				"	-r filename (load a firmware ROM)\n"
@@ -276,13 +280,21 @@ int main(int argc, char* argv[]) {
 	gui.init();
 	return app->run(gui); // Run GUI
 #else
-	// X11 version
-	DX7GUI gui(showKeyboard);
-	gui.toGui = &toGui;
-	gui.toSynth = &toSynth;
+	if(headless) {
+		DX7Headless nogui;	
+		nogui.toGui = &toGui;
+		nogui.toSynth = &toSynth;
+		std::thread tgui(&DX7Headless::run, &nogui);
+		tgui.join();
+	} else {
+		// X11 version
+		DX7GUI gui(showKeyboard);
+		gui.toGui = &toGui;
+		gui.toSynth = &toSynth;
 
-	// Launch GUI thread
-	std::thread tgui(&DX7GUI::run, &gui);
-	tgui.join(); // Clean up
+		// Launch GUI thread
+		std::thread tgui(&DX7GUI::run, &gui);
+		tgui.join(); // Clean up
+	}
 #endif
 }
