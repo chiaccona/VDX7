@@ -88,7 +88,7 @@ class DX7Headless {
 public:
 	DX7Headless() {}
 	~DX7Headless() {}
-	void run() { fprintf(stderr, "Headless mode. Hit <return> to quit\n"); getchar(); stop(); }
+	void run();
 	void idle() { } // Idle loop body for LV2
 	void stop() { running = false; }
 
@@ -101,6 +101,8 @@ public:
 	ToSynth *toSynth;
 
 private:
+	void processMessages(); // Synth to GUI messages
 	bool running = true;
+	HD44780 lcd;
 };
 

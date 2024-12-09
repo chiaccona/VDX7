@@ -21,6 +21,7 @@
 
 #include <unistd.h>
 #include <chrono>
+#include <thread>
 #include <X11/xpm.h>
 
 void DX7GUI::idle() {
@@ -458,6 +459,85 @@ void DX7GUI::processEvent() {
 		}
 	case ClientMessage:
 		if (ev.xclient.data.l[0] == (unsigned)wmDeleteMessage) running = false;
+	}
+}
+
+void DX7Headless::run() {
+	fprintf(stderr, "Headless mode: \n"
+		"	q         quit\n"
+		"	b [1-42]  button press and release\n"
+		"	h [1-42]  button hold\n"
+		"	r [1-42]  button release hold\n"
+		"	d [0-127] data slider\n"
+		"Buttons:\n"
+		" 1-32 voices,edit,func\n"
+		"   st/w=33  int/x=34 cart/y=35    op/z=36\n"
+		" ed/chr=37  int/-=38 cart/.=39 func/sp=40\n"
+		"  no/-1=41 yes/+1=42\n"
+	);
+
+	char *line = 0;
+	size_t len = 0;
+	ssize_t nread;
+	char c;
+	int val;
+	while ((nread = getline(&line, &len, stdin)) != -1) {
+		int n = sscanf(line, "%c %d\n", &c, &val);
+		if(n==1 && c=='q') break;
+		if(n==2) {
+			switch(c) {
+				case 'b':
+					if(val>=1 && val <=42) {
+						Message::CtrlID id = Message::CtrlID(val-1);
+						toSynth->buttondown(id);
+						// Have to delay button release for some functions
+						std::this_thread::sleep_for(std::chrono::milliseconds(100));
+						toSynth->buttonup(id);
+					}
+					break;
+				case 'h':
+					if(val>=1 && val <=42) {
+						Message::CtrlID id = Message::CtrlID(val-1);
+						toSynth->buttondown(id);
+					}
+					break;
+				case 'r':
+					if(val>=1 && val <=42) {
+						Message::CtrlID id = Message::CtrlID(val-1);
+						toSynth->buttonup(id);
+					}
+					break;
+				case 'd':
+					if(val>=0 && val <=127) {
+						toSynth->analog(Message::CtrlID::data, val);
+						// Don't really need delay, just waiting for LCD to update
+						std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					}
+					break;
+				default: break;
+			}
+		}
+		// Update LCD
+		processMessages();
+		printf("%s\n%s\n", lcd.line1, lcd.line2);
+	}
+	free(line);
+	stop();
+}
+
+void DX7Headless::processMessages() {
+	Message msg;
+	while(toGui->pop(msg)) {
+		switch(Message::CtrlID(msg.byte1)) {
+			case Message::CtrlID::lcd_inst: lcd.inst(msg.byte2); break;
+			case Message::CtrlID::lcd_data: lcd.data(msg.byte2); break;
+			//case Message::CtrlID::led1_setval: break;
+			//case Message::CtrlID::led2_setval: break;
+			//case Message::CtrlID::cartridge_num: break;
+			//case Message::CtrlID::cartridge_name: break;
+			//case Message::CtrlID::lcd_state: break;
+			default: break;
+		}
 	}
 }
 
