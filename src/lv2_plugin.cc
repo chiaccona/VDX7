@@ -108,6 +108,7 @@ struct DX7Plugin {
 					case LV2_MIDI_MSG_PGM_CHANGE: dx7.queueMidiRx(2, msg); break;
 					case LV2_MIDI_MSG_CHANNEL_PRESSURE: dx7.queueMidiRx(2, msg); break;
 					case LV2_MIDI_MSG_BENDER: dx7.queueMidiRx(3, msg); break;
+					case LV2_MIDI_MSG_SYSTEM_EXCLUSIVE: dx7.queueSysEx(ev->body.size, msg); break;
 					default: break;
 				}
 			} else if (ev->body.type == uris.atom_Int) {

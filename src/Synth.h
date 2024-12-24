@@ -37,6 +37,7 @@ public:
 
 	// Midi I/O
 	virtual void queueMidiRx(const uint32_t size, const uint8_t *const buffer) {}
+	virtual void queueSysEx(const uint32_t size, const uint8_t *const buffer) {}
 	virtual bool queueMidiTx(uint32_t& size, uint8_t* &buffer) { return false; }
 
 	float outputBuffer[Synth::BufSize]; // Audio buffer
@@ -84,6 +85,7 @@ public:
 
 	// Receive MIDI input and send to DX7
 	virtual void queueMidiRx(const uint32_t size, const uint8_t *const buffer);
+	virtual void queueSysEx(const uint32_t size, const uint8_t *const buffer);
 	bool parseMIDI(const uint32_t size, const uint8_t *const buffer);
 	bool serial = false; // Use DX7's native serial interface rather than sub-CPU for MIDI
 	void useSerialMidi(bool on) { serial = on; }

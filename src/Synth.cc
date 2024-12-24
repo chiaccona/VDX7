@@ -244,6 +244,12 @@ if((buffer[0]&0xF0) == 0xB0 && buffer[1]==99) { dx7.printEGS(); return; }
 		for(unsigned i=0; i<size; i++) dx7.midiSerialRx.write(buffer[i]);
 }
 
+void DX7Synth::queueSysEx(const uint32_t size, const uint8_t *const buffer) {
+    for (uint32_t i = 0; i < size; ++i) {
+        dx7.midiSerialRx.write(buffer[i]);
+    }
+}
+
 
 // Parse MIDI stream coming from CPU into discrete messages for Jack
 bool DX7Synth::queueMidiTx(uint32_t& s, uint8_t* &buffer) {
